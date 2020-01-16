@@ -40,7 +40,7 @@ class NeuralNetwork:
 		
 		for x, y in mini_batch:
 			delta_partial_w, delta_partial_b = self.backpropagation(x, y)
-			partial_w = [pw + dpw for pw, dpw in zip(partial_w, delta_partial_b)]
+			partial_w = [pw + dpw for pw, dpw in zip(partial_w, delta_partial_w)]
 			partial_b = [pb + dpb for pb, dpb in zip(partial_b, delta_partial_b)]
 		
 		self.weights = [w - (eta / len(mini_batch)) * pw for w, pw in zip(self.weights, partial_w)]
@@ -63,13 +63,13 @@ class NeuralNetwork:
 		
 		# backward pass
 		delta = (activations[-1] - y) * sigmoid_derivative(zs[-1])
-		partial_w[-1] = np.dot(delta, activations[-2])
+		partial_w[-1] = np.outer(delta, activations[-2])
 		partial_b[-1] = delta
 		
 		for l in range(2, self.layers):
 			z =  zs[-l]
-			delta = np.dot(self.weights[-l + 1], delta) * sigmoid_derivative(z)
-			partial_w[-l] = np.dot(delta, activations[-l - 1])
+			delta = np.dot(delta, self.weights[-l + 1]) * sigmoid_derivative(z)
+			partial_w[-l] = np.outer(delta, activations[-l - 1])
 			partial_b[-l] = delta
 		
 		return (partial_w, partial_b)
