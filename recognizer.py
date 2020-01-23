@@ -1,8 +1,7 @@
 import tkinter as tk
 import numpy as np
 import network1 as nn
-import io
-from PIL import Image, ImageTk, ImageFilter, ImageDraw
+from PIL import Image
 
 class Recognizer():
 	def __init__(self, network):

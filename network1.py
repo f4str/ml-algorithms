@@ -15,7 +15,8 @@ class NeuralNetwork:
 		self.weights = [np.random.randn(row, col) for row, col in zip(sizes[1:], sizes[:-1])]
 		self.biases = [np.random.randn(row) for row in sizes[1:]]
 		
-		self.mini_batch_size = 10
+		self.stochastic = True
+		self.mini_batch_size = 32
 		self.training_rate = 3.0
 	
 	def feedforward(self, a):
@@ -24,38 +25,46 @@ class NeuralNetwork:
 		return a
 	
 	def train(self, training_data, epochs):
-		self.stochastic_gradient_descent(training_data, epochs, self.mini_batch_size, self.training_rate)
+		for e in range(epochs):
+			if self.stochastic:
+				self.stochastic_gradient_descent(training_data)
+			else:
+				self.gradient_descent(training_data)
+			print(f'Epoch {e + 1}: complete')
 	
 	def test(self, test_data):
 		test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
-		accuracy = sum(int(x == y) for (x, y) in test_results) 
+		accuracy = sum(int(x == y) for (x, y) in test_results)
 		
 		print(f'Accuracy: {accuracy} / {len(test_data)}')
 	
 	def predict(self, a):
 		return np.argmax(self.feedforward(a))
 	
-	def stochastic_gradient_descent(self, training_data, epochs, mini_batch_size, training_rate):
-		n = len(training_data)
-		
-		for e in range(epochs):
-			random.shuffle(training_data)
-			mini_batches = [training_data[i:i + mini_batch_size] for i in range(0, n, mini_batch_size)]
-			for mini_batch in mini_batches:
-				self.update_mini_batch(mini_batch, training_rate)
-			print(f'Epoch {e + 1}: complete')
+	def gradient_descent(self, training_data):
+		self.update_batch(training_data)
 	
-	def update_mini_batch(self, mini_batch, training_rate):
+	def stochastic_gradient_descent(self, training_data):
+		n = len(training_data)
+		size = self.mini_batch_size
+		
+		random.shuffle(training_data)
+		mini_batches = [training_data[i:i + size] for i in range(0, n, size)]
+		for mini_batch in mini_batches:
+			self.update_batch(mini_batch)
+		print(f'Epoch {e + 1}: complete')
+	
+	def update_batch(self, batch):
 		partial_w = [np.zeros(w.shape) for w in self.weights]
 		partial_b = [np.zeros(b.shape) for b in self.biases]
 		
-		for x, y in mini_batch:
+		for x, y in batch:
 			delta_partial_w, delta_partial_b = self.backpropagation(x, y)
 			partial_w = [pw + dpw for pw, dpw in zip(partial_w, delta_partial_w)]
 			partial_b = [pb + dpb for pb, dpb in zip(partial_b, delta_partial_b)]
 		
-		self.weights = [w - (training_rate / len(mini_batch)) * pw for w, pw in zip(self.weights, partial_w)]
-		self.biases = [b - (training_rate / len(mini_batch)) * pb for b, pb in zip(self.biases, partial_b)]
+		self.weights = [w - (self.training_rate / len(batch)) * pw for w, pw in zip(self.weights, partial_w)]
+		self.biases = [b - (self.training_rate / len(batch)) * pb for b, pb in zip(self.biases, partial_b)]
 	
 	def backpropagation(self, x, y):
 		partial_w = [np.zeros(w.shape) for w in self.weights]
@@ -87,14 +96,15 @@ class NeuralNetwork:
 	def save(self, filename='network1.json'):
 		data = {
 			'sizes': self.sizes, 
-			'weights': [w.tolist() for w in self.weights], 
-			'biases': [b.tolist() for b in self.biases], 
+			'weights': [w.tolist() for w in self.weights],
+			'biases': [b.tolist() for b in self.biases],
+			'stochastic': self.stochastic,
 			'mini_batch_size': self.mini_batch_size,
 			'training_rate': self.training_rate
 		}
 		file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
 		f = open(file, 'w')
-		json.dump(data, f, indent=4)
+		json.dump(data, f)
 		f.close()
 
 
@@ -113,6 +123,7 @@ def load(filename='network1.json'):
 	net = NeuralNetwork(data["sizes"])
 	net.weights = [np.array(w) for w in data["weights"]]
 	net.biases = [np.array(b) for b in data["biases"]]
+	net.stochastic = data['stochastic']
 	net.mini_batch_size = data['mini_batch_size']
 	net.training_rate = data['training_rate']
 	return net
