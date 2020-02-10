@@ -1,5 +1,5 @@
 import data_loader
-import network1 as nn
+import network2 as nn
 
 epochs = 20
 

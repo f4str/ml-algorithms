@@ -1,6 +1,6 @@
 '''
 feedforward neural network 
-quadratic cost function
+cross entropy cost function
 stocastic gradient descent
 backpropagation
 '''
@@ -14,7 +14,7 @@ class NeuralNetwork:
 	def __init__(self, sizes, training_rate = 3.0, stochastic = True, mini_batch_size = 32):
 		self.sizes = sizes
 		self.layers = len(sizes)
-		self.weights = [np.random.randn(row, col) for row, col in zip(sizes[1:], sizes[:-1])]
+		self.weights = [np.random.randn(row, col) / np.sqrt(col) for row, col in zip(sizes[1:], sizes[:-1])]
 		self.biases = [np.random.randn(row) for row in sizes[1:]]
 		
 		self.training_rate = training_rate
@@ -83,7 +83,7 @@ class NeuralNetwork:
 			activations.append(activation)
 		
 		# backward pass
-		delta = (activations[-1] - y) * sigmoid_derivative(zs[-1])
+		delta = (activations[-1] - y)
 		partial_w[-1] = np.outer(delta, activations[-2])
 		partial_b[-1] = delta
 		
@@ -101,7 +101,7 @@ class NeuralNetwork:
 			'biases': [b.tolist() for b in self.biases],
 			'training_rate': self.training_rate,
 			'stochastic': self.stochastic,
-			'mini_batch_size': self.mini_batch_size
+			'mini_batch_size': self.mini_batch_size,
 		}
 		file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
 		f = open(file, 'w')
