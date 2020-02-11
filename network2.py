@@ -11,7 +11,7 @@ import os
 import numpy as np
 
 class NeuralNetwork:
-	def __init__(self, sizes, training_rate = 3.0, stochastic = True, mini_batch_size = 32):
+	def __init__(self, sizes, training_rate = 0.5, stochastic = True, mini_batch_size = 32):
 		self.sizes = sizes
 		self.layers = len(sizes)
 		self.weights = [np.random.randn(row, col) / np.sqrt(col) for row, col in zip(sizes[1:], sizes[:-1])]
@@ -94,7 +94,7 @@ class NeuralNetwork:
 		
 		return (partial_w, partial_b)
 	
-	def save(self, filename='network1.json'):
+	def save(self, filename='network2.json'):
 		data = {
 			'sizes': self.sizes, 
 			'weights': [w.tolist() for w in self.weights],
@@ -115,7 +115,7 @@ def sigmoid(z):
 def sigmoid_derivative(z):
 	return sigmoid(z) * (1 - sigmoid(z))
 
-def load(filename='network1.json'):
+def load(filename='network2.json'):
 	file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
 	f = open(file, 'r')
 	data = json.load(f)

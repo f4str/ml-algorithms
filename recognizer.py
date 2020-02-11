@@ -1,6 +1,6 @@
 import tkinter as tk
 import numpy as np
-import network2 as nn
+import network1 as nn
 from PIL import Image
 
 class Recognizer():
