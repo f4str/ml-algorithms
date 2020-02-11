@@ -5,7 +5,6 @@ stocastic gradient descent
 backpropagation
 '''
 
-import random
 import json
 import os
 import numpy as np
@@ -25,6 +24,9 @@ class NeuralNetwork:
 		for w, b in zip(self.weights, self.biases):
 			a = sigmoid(np.dot(w, a) + b)
 		return a
+	
+	def predict(self, a):
+		return np.argmax(self.feedforward(a))
 	
 	def train(self, training_data, epochs, test_data = None):
 		training_cost = []
@@ -48,9 +50,6 @@ class NeuralNetwork:
 		
 		return (training_cost, test_cost, training_accuracy, test_accuracy)
 	
-	def predict(self, a):
-		return np.argmax(self.feedforward(a))
-	
 	def gradient_descent(self, training_data):
 		self.update_batch(training_data)
 	
@@ -58,7 +57,7 @@ class NeuralNetwork:
 		n = len(training_data)
 		size = self.mini_batch_size
 		
-		random.shuffle(training_data)
+		np.random.shuffle(training_data)
 		mini_batches = [training_data[i:i + size] for i in range(0, n, size)]
 		for mini_batch in mini_batches:
 			self.update_batch(mini_batch)

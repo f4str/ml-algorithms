@@ -5,7 +5,6 @@ stocastic gradient descent
 backpropagation
 '''
 
-import random
 import json
 import os
 import numpy as np
@@ -26,22 +25,30 @@ class NeuralNetwork:
 			a = sigmoid(np.dot(w, a) + b)
 		return a
 	
-	def train(self, training_data, epochs):
+	def predict(self, a):
+		return np.argmax(self.feedforward(a))
+	
+	def train(self, training_data, epochs, test_data = None):
+		training_cost = []
+		test_cost = []
+		training_accuracy = []
+		test_accuracy = []
+		
 		for e in range(epochs):
 			if self.stochastic:
 				self.stochastic_gradient_descent(training_data)
 			else:
 				self.gradient_descent(training_data)
+			
+			if test_data:
+				training_cost.append(self.total_cost(training_data))
+				test_cost.append(self.total_cost(test_data, True))
+				training_accuracy.append(self.accuracy(training_data))
+				test_accuracy.append(self.accuracy(test_data, True))
+			
 			print(f'Epoch {e + 1}: complete')
-	
-	def test(self, test_data):
-		test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
-		accuracy = sum(int(x == y) for (x, y) in test_results)
 		
-		print(f'Accuracy: {accuracy} / {len(test_data)}')
-	
-	def predict(self, a):
-		return np.argmax(self.feedforward(a))
+		return (training_cost, test_cost, training_accuracy, test_accuracy)
 	
 	def gradient_descent(self, training_data):
 		self.update_batch(training_data)
@@ -50,7 +57,7 @@ class NeuralNetwork:
 		n = len(training_data)
 		size = self.mini_batch_size
 		
-		random.shuffle(training_data)
+		np.random.shuffle(training_data)
 		mini_batches = [training_data[i:i + size] for i in range(0, n, size)]
 		for mini_batch in mini_batches:
 			self.update_batch(mini_batch)
@@ -94,6 +101,24 @@ class NeuralNetwork:
 		
 		return (partial_w, partial_b)
 	
+	def total_cost(self, data, convert = False):
+		cost = 0.0
+		for x, y in data:
+			a = self.feedforward(x)
+			if convert:
+				y = convert_to_vector(y)
+			cost += np.sum(np.nan_to_num(-y * np.log(a) - (1 - y) * np.log(1 - a))) / len(data)
+		return cost
+	
+	def accuracy(self, data, convert = False):
+		if convert:
+			results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
+		else:
+			results = [(np.argmax(self.feedforward(x)), np.argmax(y)) for (x, y) in data]
+		
+		accuracy = sum(int(x == y) for (x, y) in results)
+		return accuracy
+	
 	def save(self, filename='network2.json'):
 		data = {
 			'sizes': self.sizes, 
@@ -114,6 +139,11 @@ def sigmoid(z):
 
 def sigmoid_derivative(z):
 	return sigmoid(z) * (1 - sigmoid(z))
+
+def convert_to_vector(y):
+	v = np.zeros(10)
+	v[y] = 1.0
+	return v
 
 def load(filename='network2.json'):
 	file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
