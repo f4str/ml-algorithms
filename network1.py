@@ -1,8 +1,7 @@
 '''
 feedforward neural network 
 quadratic cost function
-stocastic gradient descent
-backpropagation
+sigmoid activation function
 '''
 
 import json

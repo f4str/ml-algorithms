@@ -1,8 +1,7 @@
 '''
 feedforward neural network 
 cross entropy cost function
-stocastic gradient descent
-backpropagation
+sigmoid activation function
 '''
 
 import json

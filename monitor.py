@@ -12,7 +12,7 @@ nn = network2.NeuralNetwork([784, 30, 10])
 fig, (ax1, ax2) = plt.subplots(1, 2)
 
 epochs = np.arange(500)
-training_cost, test_cost, training_accuracy, test_accuracy = nn.train(training_data[:100], len(epochs), test_data[:100])
+training_cost, test_cost, training_accuracy, test_accuracy = nn.train(training_data[:500], len(epochs), test_data[:500])
 print('training_complete')
 
 ax1.set_title('Cost vs Epochs')
