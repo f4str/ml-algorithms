@@ -3,7 +3,7 @@ feedforward neural network
 tensorflow
 cross entropy loss function
 softmax activation function
-gradient descent optimizer
+adam optimizer
 '''
 
 import tensorflow as tf
@@ -11,7 +11,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 class NeuralNetwork:
 	def __init__(self):
-		self.learning_rate = 0.5
+		self.learning_rate = 0.1
 		self.num_steps = 500
 		self.batch_size = 128
 		
@@ -20,8 +20,16 @@ class NeuralNetwork:
 		self.num_input = 784
 		self.num_classes = 10
 		
-		self.weights = tf.Variable(tf.zeros([self.num_input, self.num_classes]))
-		self.biases = tf.Variable([tf.zeros([self.num_classes])])
+		self.weights = [
+			tf.Variable(tf.random_normal([self.num_input, self.n_hidden_1])),
+			tf.Variable(tf.random_normal([self.n_hidden_1, self.n_hidden_2])),
+			tf.Variable(tf.random_normal([self.n_hidden_2, self.num_classes]))
+		]
+		self.biases = [
+			tf.Variable(tf.random_normal([self.n_hidden_1])),
+			tf.Variable(tf.random_normal([self.n_hidden_2])),
+			tf.Variable(tf.random_normal([self.num_classes]))
+		]
 		
 		self.load_data()
 		self.build()
@@ -33,13 +41,15 @@ class NeuralNetwork:
 		self.x = tf.placeholder(tf.float32, [None, self.num_input])
 		self.y = tf.placeholder(tf.float32, [None, self.num_classes])
 		
-		self.logits = tf.matmul(self.x, self.weights) + self.biases
+		self.layer1 = tf.matmul(self.x, self.weights[0]) + self.biases[0]
+		self.layer2 = tf.matmul(self.layer1, self.weights[1]) + self.biases[1]
+		self.logits = tf.matmul(self.layer2, self.weights[2]) + self.biases[2]
 		self.prediction = tf.nn.softmax(self.logits)
 		
 		cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.logits, labels=self.y)
 		self.loss = tf.reduce_mean(cross_entropy)
 		
-		self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
+		self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
 		
 		correct_prediction = tf.equal(tf.argmax(self.prediction, axis=1), tf.argmax(self.y, axis=1))
 		self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))

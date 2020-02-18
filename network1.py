@@ -2,6 +2,7 @@
 feedforward neural network 
 quadratic cost function
 sigmoid activation function
+stochastic gradient descent
 '''
 
 import json
