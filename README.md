@@ -1,6 +1,6 @@
 # Machine Learning Algorithms
 
-Implementations of various machine learning algorithms using only numpy
+Implementations of various machine learning algorithms using only numpy. All implementations follows the class style and structure found in the scikit-learn library. 
 
 ## Algorithms
 
