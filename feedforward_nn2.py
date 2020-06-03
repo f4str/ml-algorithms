@@ -4,10 +4,8 @@ cross entropy cost function
 sigmoid activation function
 stochastic gradient descent
 '''
-
-import json
-import os
 import numpy as np
+
 
 class NeuralNetwork:
 	def __init__(self, sizes, training_rate = 0.5, stochastic = True, mini_batch_size = 32):
@@ -118,20 +116,6 @@ class NeuralNetwork:
 		
 		accuracy = sum(int(x == y) for (x, y) in results)
 		return accuracy
-	
-	def save(self, filename='network2.json'):
-		data = {
-			'sizes': self.sizes, 
-			'weights': [w.tolist() for w in self.weights],
-			'biases': [b.tolist() for b in self.biases],
-			'training_rate': self.training_rate,
-			'stochastic': self.stochastic,
-			'mini_batch_size': self.mini_batch_size,
-		}
-		file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
-		f = open(file, 'w')
-		json.dump(data, f)
-		f.close()
 
 
 def sigmoid(z):
@@ -144,17 +128,3 @@ def convert_to_vector(y):
 	v = np.zeros(10)
 	v[y] = 1.0
 	return v
-
-def load(filename='network2.json'):
-	file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), 'networks', filename))
-	f = open(file, 'r')
-	data = json.load(f)
-	f.close()
-	
-	net = NeuralNetwork(data["sizes"])
-	net.weights = [np.array(w) for w in data["weights"]]
-	net.biases = [np.array(b) for b in data["biases"]]
-	net.training_rate = data['training_rate']
-	net.stochastic = data['stochastic']
-	net.mini_batch_size = data['mini_batch_size']
-	return net
