@@ -17,12 +17,16 @@ class RidgeRegression:
 			ones = np.ones((X.shape[0], 1))
 			X = np.concatenate((ones, X), 1)
 		
+		# closed form
 		beta = np.dot(np.dot(np.linalg.inv(np.dot(X.T, X) + np.identity(X.shape[1]) * self.alpha), X.T), y)
 		
 		y_pred = np.dot(X, beta)
 		sse = np.sum(np.square(np.subtract(y, y_pred)))
 		s_yy = np.sum(np.square(np.subtract(y, np.mean(y))))
-		loss = np.mean(sse)
+		
+		# mean squared error loss
+		loss = sse / len(y)
+		# r^2 accuracy
 		acc = 1 - sse / s_yy
 		
 		if self.fit_intercept:

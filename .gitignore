@@ -1,12 +1,7 @@
 .vscode/
+.idea/
 __pycache__/
 *.py[cod]
-
-env/
 venv/
-.env/
-.venv/
-
-images/
 data/
 
