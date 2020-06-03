@@ -88,7 +88,7 @@ class NeuralNetwork:
 			activations.append(activation)
 		
 		# backward pass
-		delta = (activations[-1] - y)
+		delta = (activations[-1] - y) * sigmoid_derivative(zs[-1])
 		partial_w[-1] = np.outer(delta, activations[-2])
 		partial_b[-1] = delta
 		
@@ -105,7 +105,7 @@ class NeuralNetwork:
 			a = self.feedforward(x)
 			if convert:
 				y = convert_to_vector(y)
-			cost += np.sum(np.nan_to_num(-y * np.log(a) - (1 - y) * np.log(1 - a))) / len(data)
+			cost += 0.5 * np.linalg.norm(a - y) ** 2 / len(data)
 		return cost
 	
 	def accuracy(self, data, convert = False):

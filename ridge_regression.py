@@ -10,22 +10,26 @@ class RidgeRegression:
 	
 	def fit(self, X, y):
 		X = np.array(X)
+		y = np.array(y)
 		
 		if len(X.shape) == 1:
 			X = X.reshape(-1, 1)
+		
+		n, k = X.shape
+		
 		if self.fit_intercept:
-			ones = np.ones((X.shape[0], 1))
+			ones = np.ones((n, 1))
 			X = np.concatenate((ones, X), 1)
 		
 		# closed form
-		beta = np.dot(np.dot(np.linalg.inv(np.dot(X.T, X) + np.identity(X.shape[1]) * self.alpha), X.T), y)
+		beta = np.dot(np.linalg.inv(X.T @ X + self.alpha * np.identity(k)) @ X.T, y)
 		
 		y_pred = np.dot(X, beta)
-		sse = np.sum(np.square(np.subtract(y, y_pred)))
-		s_yy = np.sum(np.square(np.subtract(y, np.mean(y))))
+		sse = np.sum(np.square(y - y_pred))
+		s_yy = np.sum(np.square(y - y.mean()))
 		
 		# mean squared error loss
-		loss = sse / len(y)
+		loss = sse / n
 		# r^2 accuracy
 		acc = 1 - sse / s_yy
 		
@@ -41,8 +45,10 @@ class RidgeRegression:
 		return np.dot(X, self.weights) + self.bias
 	
 	def score(self, X, y):
+		y = np.array(y)
 		y_pred = self.predict(X)
-		sse = np.sum(np.square(np.subtract(y, y_pred)))
-		s_yy = np.sum(np.square(np.subtract(y, np.mean(y))))
+		
+		sse = np.sum(np.square(y - y_pred))
+		s_yy = np.sum(np.square(y - y.mean()))
 		
 		return 1 - sse / s_yy

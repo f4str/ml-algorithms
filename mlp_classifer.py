@@ -9,10 +9,9 @@ def sigmoid_derivative(z):
 	return sigmoid(z) * (1 - sigmoid(z))
 
 
-def convert_to_vector(y):
-	v = np.zeros(10)
-	v[y] = 1.0
-	return v
+def softmax(z, axis=0):
+	t = np.exp(z)
+	return t / np.sum(t, axis=axis)
 
 
 class MLPClassifier:
@@ -20,13 +19,19 @@ class MLPClassifier:
 		self.n_inputs = n_inputs
 		self.n_classes = n_classes
 		self.hidden_sizes = hidden_sizes
+		self.n_layers = len(hidden_sizes) + 2
 		
 		sizes = np.concatenate(([n_inputs], hidden_sizes,[n_classes]))
 		
+		# xavier weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(col) for row, col in zip(sizes[1:], sizes[:-1])]
+		# zero bias initialization
 		self.biases = [np.zeros(row) for row in sizes[1:]]
 		
-		activations = {'sigmoid', 'relu', 'tanh', 'none'}
+		if activation in {'sigmoid', 'relu', 'tanh'}:
+			self.activation = activation
+		else:
+			self.activation = 'none' 
 	
 	def feedforward(self, a):
 		for w, b in zip(self.weights, self.biases):
@@ -88,11 +93,11 @@ class MLPClassifier:
 			activations.append(activation)
 		
 		# backward pass
-		delta = (activations[-1] - y) * sigmoid_derivative(zs[-1])
+		delta = (activations[-1] - y)
 		partial_w[-1] = np.outer(delta, activations[-2])
 		partial_b[-1] = delta
 		
-		for l in range(2, self.layers):
+		for l in range(2, self.n_layers):
 			delta = np.dot(delta, self.weights[-l + 1]) * sigmoid_derivative(zs[-l])
 			partial_w[-l] = np.outer(delta, activations[-l - 1])
 			partial_b[-l] = delta
@@ -108,7 +113,7 @@ class MLPClassifier:
 			one_hot_y[y] = 1.0
 			y = one_hot_y
 			
-			cost += 0.5 * np.linalg.norm(a - y) ** 2 / len(data)
+			cost += np.sum(np.nan_to_num(-y * np.log(a) - (1 - y) * np.log(1 - a))) / len(data)
 		return cost
 	
 	def accuracy(self, data):

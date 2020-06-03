@@ -17,29 +17,34 @@ class LogisticRegression:
 	
 	def fit(self, X, y, epochs=1000, lr=1e-3):
 		X = np.array(X)
+		y = np.array(y)
+		
 		if len(X.shape) == 1:
 			X = X.reshape(-1, 1)
+		
+		n, k = X.shape
+		
 		if self.fit_intercept:
-			ones = np.ones((X.shape[0], 1))
+			ones = np.ones((n, 1))
 			X = np.concatenate((ones, X), 1)
 		
 		training_loss = []
 		training_acc = []
 		
 		# xavier weight initialization
-		beta = np.random.randn(X.shape[1]) / np.sqrt(X.shape[1])
+		beta = np.random.randn(k) / np.sqrt(k)
 		
 		# gradient descent
 		for _ in range(epochs):
 			z = np.dot(X, beta)
 			a = sigmoid(z)
-			gradient = np.dot(X.T, a - y) / y.size
+			gradient = np.dot(X.T, a - y) / n
 			beta -= lr * gradient
 			
 			# cross entropy loss
 			loss = cross_entropy(a, y)
 			# binary accuracy
-			acc = np.mean(np.equal(np.around(a), y))
+			acc = np.mean(np.around(a) == y)
 			
 			training_loss.append(loss)
 			training_acc.append(acc)
@@ -60,4 +65,4 @@ class LogisticRegression:
 	
 	def score(self, X, y):
 		y_pred = self.predict(X)
-		return np.mean(np.equal(y_pred, y))
+		return np.mean(y_pred == y)
