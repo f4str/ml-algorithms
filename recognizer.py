@@ -85,6 +85,6 @@ class Recognizer():
 		self.root.mainloop()
 
 if __name__ == '__main__':
-	recognizer = Recognizer('network.json')
+	recognizer = Recognizer('network2.json')
 	recognizer.start()
 
