@@ -109,7 +109,7 @@ class MLPClassifier:
 				partial_W[-1] = np.dot(a_batch[-2].T, delta) / m
 				partial_b[-1] = np.mean(delta, axis=0)
 				
-				for l in range(2, self.layers):
+				for l in range(2, self.n_layers):
 					delta = np.dot(delta, self.weights[-l + 1].T) * self.derivative(z_batch_layers[-l])
 					partial_W[-l] = np.dot(a_batch_layers[-l - 1].T, delta) / m
 					partial_b[-l] = np.mean(delta, axis=0)
