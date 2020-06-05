@@ -3,14 +3,19 @@ import numpy as np
 
 class LinearRegression:
 	def __init__(self, fit_intercept=True):
+		self.fit_intercept = fit_intercept
+		self.n_features = 0
+		self.n_outputs = 1
 		self.weights = []
 		self.bias = 0
-		self.fit_intercept = fit_intercept
 	
 	def fit(self, X, y):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
+		
+		self.n_features = k
+		self.n_outputs = 1
 		
 		if self.fit_intercept:
 			ones = np.ones((n, 1))

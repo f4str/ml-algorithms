@@ -11,7 +11,7 @@ def tanh(z):
 	return np.tanh(z)
 
 def tanh_derivative(z):
-	return 1 - np.tanh(z) ** 2
+	return 1 - np.square(np.tanh(z))
 
 def relu(z):
 	return z * (z > 0)
@@ -30,6 +30,8 @@ class MLPRegressor:
 	def __init__(self, hidden_sizes=(10,), activation='relu'):
 		self.hidden_sizes = hidden_sizes
 		self.n_layers = len(hidden_sizes) + 2
+		self.n_features = 0
+		self.n_outputs = 1
 		self.weights = []
 		self.biases = []
 		
@@ -46,12 +48,15 @@ class MLPRegressor:
 			self.activation = identify
 			self.derivative = identify_derivative
 	
-	def fit(self, X, y, epochs=10, lr=1e-3, batch_size=32):
+	def fit(self, X, y, epochs=1, lr=1e-3, batch_size=32):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
 		
-		sizes = np.concatenate(([k], hidden_sizes, [1]))
+		self.n_features = k
+		self.n_outputs = 1
+		
+		sizes = np.concatenate(([k], hidden_sizes, [self.n_outputs]))
 		
 		# xavier weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(row) for row, col in zip(sizes[:-1], sizes[1:])]
@@ -74,7 +79,7 @@ class MLPRegressor:
 			for X_batch, y_batch in batches:
 				m = len(X_batch)
 				
-				partial_W = [np.zeros(w.shape) for w in self.weights]
+				partial_W = [np.zeros(W.shape) for W in self.weights]
 				partial_b = [np.zeros(b.shape) for b in self.biases]
 				
 				# forward pass
@@ -127,72 +132,3 @@ class MLPRegressor:
 		r2 = 1 - sse / s_yy
 		
 		return loss, r2
-	
-	def update_batch(self, batch):
-		partial_w = [np.zeros(w.shape) for w in self.weights]
-		partial_b = [np.zeros(b.shape) for b in self.biases]
-		
-		for x, y in batch:
-			delta_partial_w, delta_partial_b = self.backpropagation(x, y)
-			partial_w = [pw + dpw for pw, dpw in zip(partial_w, delta_partial_w)]
-			partial_b = [pb + dpb for pb, dpb in zip(partial_b, delta_partial_b)]
-		
-		self.weights = [w - (self.training_rate / len(batch)) * pw for w, pw in zip(self.weights, partial_w)]
-		self.biases = [b - (self.training_rate / len(batch)) * pb for b, pb in zip(self.biases, partial_b)]
-	
-	def backpropagation(self, x, y):
-		partial_w = [np.zeros(w.shape) for w in self.weights]
-		partial_b = [np.zeros(b.shape) for b in self.biases]
-		
-		# feedforward
-		activation = x
-		activations = [x]
-		zs = []
-		
-		for w, b in zip(self.weights, self.biases):
-			z = np.dot(w, activation) + b
-			zs.append(z)
-			activation = sigmoid(z)
-			activations.append(activation)
-		
-		# backward pass
-		delta = (activations[-1] - y) * sigmoid_derivative(zs[-1])
-		partial_w[-1] = np.outer(delta, activations[-2])
-		partial_b[-1] = delta
-		
-		for l in range(2, self.layers):
-			delta = np.dot(delta, self.weights[-l + 1]) * sigmoid_derivative(zs[-l])
-			partial_w[-l] = np.outer(delta, activations[-l - 1])
-			partial_b[-l] = delta
-		
-		return (partial_w, partial_b)
-	
-	def total_cost(self, data, convert = False):
-		cost = 0.0
-		for x, y in data:
-			a = self.feedforward(x)
-			if convert:
-				y = convert_to_vector(y)
-			cost += 0.5 * np.linalg.norm(a - y) ** 2 / len(data)
-		return cost
-	
-	def accuracy(self, data, convert = False):
-		if convert:
-			results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
-		else:
-			results = [(np.argmax(self.feedforward(x)), np.argmax(y)) for (x, y) in data]
-		
-		accuracy = sum(int(x == y) for (x, y) in results)
-		return accuracy
-
-
-def sigmoid(z):
-	return 1 / (1 + np.exp(-z))
-
-def sigmoid_derivative(z):
-	return sigmoid(z) * (1 - sigmoid(z))
-
-def convert_to_vector(y):
-	v = np.zeros(10)
-	v[y] = 1.0
-	return v

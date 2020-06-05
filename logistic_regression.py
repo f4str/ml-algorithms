@@ -10,14 +10,19 @@ def cross_entropy(a, y):
 
 class LogisticRegression:
 	def __init__(self, fit_intercept=True):
+		self.fit_intercept = fit_intercept
+		self.n_features = 0
+		self.n_classes = 2
 		self.weights = []
 		self.bias = 0
-		self.fit_intercept = fit_intercept
 			
 	def fit(self, X, y, epochs=1, lr=1e-3):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
+		
+		self.n_features = k
+		self.n_classes = 2
 		
 		if self.fit_intercept:
 			ones = np.ones((n, 1))

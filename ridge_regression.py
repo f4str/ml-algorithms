@@ -3,15 +3,20 @@ import numpy as np
 
 class RidgeRegression:
 	def __init__(self, alpha=1.0, fit_intercept=True):
-		self.weights = []
-		self.bias = 0
 		self.alpha = alpha
 		self.fit_intercept = fit_intercept
+		self.n_features = 0
+		self.n_outputs = 1
+		self.weights = []
+		self.bias = 0
 	
 	def fit(self, X, y):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
+		
+		self.n_features = k
+		self.n_outputs = 1
 		
 		if self.fit_intercept:
 			ones = np.ones((n, 1))
@@ -26,8 +31,8 @@ class RidgeRegression:
 		
 		# mean squared error loss
 		loss = sse / n
-		# r^2 accuracy
-		acc = 1 - sse / s_yy
+		# r^2 score
+		r2 = 1 - sse / s_yy
 		
 		if self.fit_intercept:
 			self.bias = beta[0]
@@ -36,7 +41,7 @@ class RidgeRegression:
 			self.bias = 0
 			self.weights = beta
 		
-		return loss, acc
+		return loss, r2
 	
 	def predict(self, X):
 		return np.dot(X, self.weights) + self.bias
