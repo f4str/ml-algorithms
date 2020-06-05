@@ -21,7 +21,7 @@ class MLPClassifier:
 		self.hidden_sizes = hidden_sizes
 		self.n_layers = len(hidden_sizes) + 2
 		
-		sizes = np.concatenate(([n_inputs], hidden_sizes,[n_classes]))
+		sizes = np.concatenate(([n_inputs], hidden_sizes, [n_classes]))
 		
 		# xavier weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(col) for row, col in zip(sizes[1:], sizes[:-1])]

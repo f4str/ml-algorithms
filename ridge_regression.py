@@ -11,10 +11,6 @@ class RidgeRegression:
 	def fit(self, X, y):
 		X = np.array(X)
 		y = np.array(y)
-		
-		if len(X.shape) == 1:
-			X = X.reshape(-1, 1)
-		
 		n, k = X.shape
 		
 		if self.fit_intercept:
@@ -37,6 +33,7 @@ class RidgeRegression:
 			self.bias = beta[0]
 			self.weights = beta[1:]
 		else:
+			self.bias = 0
 			self.weights = beta
 		
 		return loss, acc
@@ -44,11 +41,16 @@ class RidgeRegression:
 	def predict(self, X):
 		return np.dot(X, self.weights) + self.bias
 	
-	def score(self, X, y):
+	def evaluate(self, X, y):
 		y = np.array(y)
 		y_pred = self.predict(X)
 		
 		sse = np.sum(np.square(y - y_pred))
 		s_yy = np.sum(np.square(y - y.mean()))
 		
-		return 1 - sse / s_yy
+		# mean squared error loss
+		loss = sse / len(y)
+		# r^2 score
+		r2 = 1 - sse / s_yy
+		
+		return loss, r2
