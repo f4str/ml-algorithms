@@ -135,12 +135,12 @@ class MLPClassifier:
 	
 	def evaluate(self, X, y):
 		one_hot_y = np.eye(self.n_classes)[y]
-		y_pred_probs = self.predict_proba(X)
-		y_preds = np.argmax(y_pred_probs, axis=1)
+		y_pred_prob = self.predict_proba(X)
+		y_pred = np.argmax(y_pred_prob, axis=1)
 		
 		# cross entropy loss
-		loss = cross_entropy(y_pred_probs, one_hot_y, axis=1)
+		loss = cross_entropy(y_pred_prob, one_hot_y, axis=1)
 		# categorical accuracy
-		acc = np.mean(y_preds == y)
+		acc = np.mean(y_pred == y)
 		
 		return loss, acc

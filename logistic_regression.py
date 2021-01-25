@@ -66,10 +66,11 @@ class LogisticRegression:
 	
 	def evaluate(self, X, y):
 		y = np.array(y)
-		y_pred = self.predict(X)
+		y_pred_prob = self.predict_proba(X)
+		y_pred = np.argmax(y_pred_prob, axis=1)
 		
 		# cross entropy loss
-		loss = cross_entropy(y_pred, y)
+		loss = cross_entropy(y_pred_prob, y)
 		# binary accuracy
 		acc = np.mean(y_pred == y)
 		
