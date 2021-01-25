@@ -7,5 +7,6 @@ Implementations of various machine learning algorithms using only numpy. All imp
 - Linear Regression
 - Ridge Regression
 - Logistic Regression
+- Decision Tree Classifier
 - Multilayer Perceptron Regressor
 - Multilayer Perceptron Classifier
