@@ -19,7 +19,7 @@ class LogisticRegression:
 		self.weights = []
 		self.bias = 0
 	
-	def _penalty(self):
+	def _penalty_cost(self):
 		# check if weights initialized
 		if not self.weights:
 			return 0
@@ -84,7 +84,7 @@ class LogisticRegression:
 				self.weights = beta
 			
 			# cross entropy + penalty loss
-			loss = cross_entropy(a, y) + self._penalty()
+			loss = cross_entropy(a, y) + self._penalty_cost()
 			# binary accuracy
 			acc = np.mean(np.around(a) == y)
 			
@@ -108,7 +108,7 @@ class LogisticRegression:
 		y_pred = np.argmax(y_pred_prob, axis=1)
 		
 		# cross entropy + penalty loss
-		loss = cross_entropy(y_pred_prob, y) + self._penalty()
+		loss = cross_entropy(y_pred_prob, y) + self._penalty_cost()
 		# binary accuracy
 		acc = np.mean(y_pred == y)
 		

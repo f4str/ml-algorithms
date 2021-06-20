@@ -7,25 +7,25 @@ def gini_score(p):
 def entropy_score(p):
 	return -np.sum(p * np.log(p))
 
-def random_score(p):
-	return np.random.rand()
+def misclassification_score(p):
+	return 1 - np.max(p)
 
 
-class DecisionTreeNode:
+class DecisionTreeClassifierNode:
 	def __init__(self, score, num_samples, num_samples_per_class, predicted_class):
 		self.score = score
 		self.num_samples = num_samples
 		self.num_samples_per_class = num_samples_per_class
 		self.predicted_class = predicted_class
-		self.feature_index = 0
+		self.feature = 0
 		self.threshold = 0
 		self.left = None
 		self.right = None
 
 
-class DecisionTree:
+class DecisionTreeClassifier:
 	def __init__(self, criterion='gini', max_depth=None):
-		self.criterion = criterion
+		self.criterion = criterion.lower()
 		self.depth = 0
 		self.n_features = 0
 		self.n_classes = 0
@@ -33,12 +33,14 @@ class DecisionTree:
 		self.tree = None
 		self.max_depth = max_depth
 		
-		if criterion == 'entropy':
-			self.score_fn = entropy_score
-		elif criterion == 'gini':
+		if self.criterion == 'gini':
 			self.score_fn = gini_score
+		elif self.criterion == 'entropy':
+			self.score_fn = entropy_score
+		elif self.criterion == 'misclassification':
+			self.score_fn = misclassification_score
 		else:
-			self.score_fn = random_score
+			raise ValueError(f'invalid criterion: {criterion}')
 	
 	def fit(self, X, y):
 		X = np.array(X)
@@ -63,7 +65,7 @@ class DecisionTree:
 		# p_k = count of class k / total
 		score = self.score_fn(num_samples_per_class / n)
 		
-		node = DecisionTreeNode(
+		node = DecisionTreeClassifierNode(
 			score=score,
 			num_samples=n,
 			num_samples_per_class=num_samples_per_class,
@@ -75,23 +77,27 @@ class DecisionTree:
 			self.depth = max(depth, self.depth)
 			
 			# find optimal split for node
-			idx, threshold = self._split(X, y)
+			feature, threshold = self._split(X, y)
 			
-			if idx is not None:
+			if feature is not None:
 				# calculate left and right indices
-				idx_left = X[:, idx] < threshold
+				idx_left = X[:, feature] < threshold
 				idx_right = ~idx_left
 				# split to left and right nodes
 				X_left, y_left = X[idx_left], y[idx_left]
 				X_right, y_right = X[idx_right], y[idx_right]
 				
 				# update node values
-				node.feature_index = idx
+				node.feature = feature
 				node.threshold = threshold
 				node.left = self._build_tree(X_left, y_left, depth + 1)
 				node.right = self._build_tree(X_right, y_right, depth + 1)
 			else:
+				# leaf node
 				self.n_leaves += 1
+		else:
+			# leaf node
+			self.n_leaves += 1
 		
 		return node
 	
@@ -104,12 +110,12 @@ class DecisionTree:
 		num_samples_per_class = np.bincount(y, minlength=self.n_classes)
 		# p_k = count of class k / total
 		best_score = self.score_fn(num_samples_per_class / n)
-		best_idx, best_threshold = None, None
+		best_feature, best_threshold = None, None
 		
 		# loop through all features
-		for idx in range(self.n_features):
+		for feature in range(self.n_features):
 			# get current feature vector of all entries
-			X_j = X[:, idx]
+			X_j = X[:, feature]
 			# sorted vector is the thresholds
 			sorted_indices = np.argsort(X_j)
 			thresholds, classes = X_j[sorted_indices], y[sorted_indices]
@@ -135,10 +141,10 @@ class DecisionTree:
 				
 				if score < best_score:
 					best_score = score
-					best_idx = idx
+					best_feature = feature
 					best_threshold = (thresholds[i] + thresholds[i - 1]) / 2
 					
-		return best_idx, best_threshold
+		return best_feature, best_threshold
 	
 	def predict(self, X):
 		return np.array([self._predict_one(x) for x in X])
@@ -159,7 +165,7 @@ class DecisionTree:
 	def _predict_node(self, x):
 		node = self.tree
 		while node.left:
-			if x[node.feature_index] < node.threshold:
+			if x[node.feature] < node.threshold:
 				node = node.left
 			else:
 				node = node.right

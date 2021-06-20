@@ -36,24 +36,25 @@ def cross_entropy(a, y, axis):
 class MLPClassifier:
 	def __init__(self, hidden_sizes=(100,), activation='relu'):
 		self.hidden_sizes = hidden_sizes
+		self.activation = activation.lower()
 		self.n_layers = len(hidden_sizes) + 2
 		self.n_features = 0
 		self.n_classes = 0
 		self.weights = []
 		self.biases = []
 		
-		if activation == 'sigmoid':
-			self.activation = sigmoid
-			self.derivative = sigmoid_derivative
-		elif activation == 'tanh':
-			self.activation = tanh
-			self.derivative = tanh_derivative
-		elif activation == 'relu':
-			self.activation = relu
-			self.derivative = relu_derivative
+		if self.activation == 'sigmoid':
+			self.activation_fn = sigmoid
+			self.derivative_fn = sigmoid_derivative
+		elif self.activation == 'tanh':
+			self.activation_fn = tanh
+			self.derivative_fn = tanh_derivative
+		elif self.activation == 'relu':
+			self.activation_fn = relu
+			self.derivative_fn = relu_derivative
 		else:
-			self.activation = identify
-			self.derivative = identify_derivative
+			self.activation_fn = identify
+			self.derivative_fn = identify_derivative
 	
 	def fit(self, X, y, epochs=100, lr=1e-3, batch_size=32):
 		X = np.array(X)
@@ -98,7 +99,7 @@ class MLPClassifier:
 				for W, b in zip(self.weights, self.biases):
 					z_batch = np.dot(a_batch, W) + b
 					z_batch_layers.append(z_batch)
-					a_batch = self.activation(z_batch)
+					a_batch = self.activation_fn(z_batch)
 					a_batch_layers.append(a_batch)
 				
 				a_batch = softmax(z_batch, axis=1)
@@ -110,7 +111,7 @@ class MLPClassifier:
 				partial_b[-1] = np.mean(delta, axis=0)
 				
 				for l in range(2, self.n_layers):
-					delta = np.dot(delta, self.weights[-l + 1].T) * self.derivative(z_batch_layers[-l])
+					delta = np.dot(delta, self.weights[-l + 1].T) * self.derivative_fn(z_batch_layers[-l])
 					partial_W[-l] = np.dot(a_batch_layers[-l - 1].T, delta) / m
 					partial_b[-l] = np.mean(delta, axis=0)
 				
@@ -125,7 +126,7 @@ class MLPClassifier:
 	
 	def predict_proba(self, X):
 		for W, b in zip(self.weights[:-1], self.biases[:-1]):
-			X = self.activation(np.dot(X, W) + b)
+			X = self.activation_fn(np.dot(X, W) + b)
 		
 		X = np.dot(X, self.weights[-1]) + self.biases[-1]
 		return softmax(X, axis=1)
