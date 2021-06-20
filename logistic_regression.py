@@ -7,46 +7,51 @@ def sigmoid(z):
 def cross_entropy(a, y):
 	return -np.mean(np.nan_to_num(y * np.log(a) + (1 - y) * np.log(1 - a)))
 
-def no_penalty(C, w):
-	return 0
-
-def no_penalty_gradient(C, w):
-	return 0
-
-def l1_penalty(C, w):
-	return C * np.mean(np.abs(w))
-
-def l1_penalty_gradient(C, w):
-	return C * np.mean(np.sign(w))
-
-def l2_penalty(C, w):
-	return C * np.mean(np.square(w))
-
-def l2_penalty_gradient(C, w):
-	return 2 * C * np.mean(w)
-
 
 class LogisticRegression:
-	def __init__(self, fit_intercept=True, penalty='l2', C=1):
-		self.fit_intercept = fit_intercept
+	def __init__(self, penalty='l2', C=1, l1_ratio=0, fit_intercept=True):
 		self.penalty = penalty.lower()
 		self.C = C
+		self.l1_ratio = l1_ratio
+		self.fit_intercept = fit_intercept
 		self.n_features = 0
 		self.n_classes = 0
 		self.weights = []
 		self.bias = 0
+	
+	def _penalty(self):
+		# check if weights initialized
+		if not self.weights:
+			return 0
 		
 		if self.penalty == 'l1':
-			self.penalty = l1_penalty
-			self.penalty_gradient = l2_penalty_gradient
+			return self.C * np.mean(np.abs(self.weights))
 		elif self.penalty == 'l2':
-			self.penalty = l2_penalty
-			self.penalty_gradient = l2_penalty_gradient
+			return self.C * np.mean(np.square(self.weights))
+		elif self.penalty == 'elasticnet':
+			l1 = self.l1_ratio + self.C * np.mean(np.abs(self.weights))
+			l2 = (1 - self.l1_ratio) * self.C * np.mean(np.square(self.weights))
+			return l1 + l2
 		else:
-			self.penalty = no_penalty
-			self.penalty_gradient = no_penalty_gradient
+			return 0
+	
+	def _penalty_gradient(self):
+		# check if weights initialized 
+		if not self.weights:
+			return 0
+		
+		if self.penalty == 'l1':
+			return self.C * np.mean(np.sign(self.weights))
+		elif self.penalty == 'l2':
+			return 2 * self.C * np.mean(self.weights)
+		elif self.penalty == 'elasticnet':
+			l1 = self.C * np.mean(np.sign(self.weights))
+			l2 = 2 * self.C * np.mean(self.weights)
+			return self.l1_ratio * l1 + (1 - self.l1_ratio) * l2
+		else:
+			return 0
 			
-	def fit(self, X, y, epochs=1, lr=1e-3):
+	def fit(self, X, y, epochs=100, lr=1e-3):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
@@ -61,7 +66,7 @@ class LogisticRegression:
 		training_loss = []
 		training_acc = []
 		
-		# xavier weight initialization
+		# random weight initialization
 		beta = np.random.randn(k) / np.sqrt(k)
 		
 		# gradient descent
@@ -69,22 +74,22 @@ class LogisticRegression:
 			z = np.dot(X, beta)
 			a = sigmoid(z)
 			gradient = np.dot(X.T, a - y) / n
-			beta -= lr * gradient + self.penalty_gradient(self.C, beta)
+			beta -= lr * (gradient + self._penalty_gradient())
 			
-			# cross entropy loss
-			loss = cross_entropy(a, y) + self.penalty(self.C, beta)
+			if self.fit_intercept:
+				self.bias = beta[0]
+				self.weights = beta[1:]
+			else:
+				self.bias = 0
+				self.weights = beta
+			
+			# cross entropy + penalty loss
+			loss = cross_entropy(a, y) + self._penalty()
 			# binary accuracy
 			acc = np.mean(np.around(a) == y)
 			
 			training_loss.append(loss)
 			training_acc.append(acc)
-		
-		if self.fit_intercept:
-			self.bias = beta[0]
-			self.weights = beta[1:]
-		else:
-			self.bias = 0
-			self.weights = beta
 		
 		return training_loss, training_acc
 	
@@ -102,8 +107,8 @@ class LogisticRegression:
 		y_pred_prob = self.predict_proba(X)
 		y_pred = np.argmax(y_pred_prob, axis=1)
 		
-		# cross entropy loss
-		loss = cross_entropy(y_pred_prob, y) + self.penalty(self.C, self.weights)
+		# cross entropy + penalty loss
+		loss = cross_entropy(y_pred_prob, y) + self._penalty()
 		# binary accuracy
 		acc = np.mean(y_pred == y)
 		
