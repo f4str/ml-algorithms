@@ -42,6 +42,8 @@ class DecisionTree:
 		self.n_classes = len(np.unique(y))
 		self.n_features = k
 		self.tree = self._build_tree(X, y)
+		
+		return self.evaluate(X, y)
 	
 	def _build_tree(self, X, y, depth=0):
 		n = y.size
@@ -133,20 +135,35 @@ class DecisionTree:
 	def predict(self, X):
 		return np.array([self._predict_one(x) for x in X])
 	
+	def predict_proba(self, X):
+		return np.array([self._predict_proba_one(x) for x in X])
+	
+	def predict_log_proba(self, X):
+		return np.log(self.predict_proba(X))
+	
 	def _predict_one(self, x):
+		return self._predict_node(x).predicted_class
+	
+	def _predict_proba_one(self, x):
+		node = self._predict_node(x)
+		return np.mean(node.num_samples_per_class == node.predicted_class)
+	
+	def _predict_node(self, x):
 		node = self.tree
 		while node.left:
 			if x[node.feature_index] < node.threshold:
 				node = node.left
 			else:
 				node = node.right
-		return node.predicted_class
+		return node
 	
 	def evaluate(self, X, y):
 		y = np.array(y)
 		y_pred = self.predict(X)
 		
+		# gini/entropy score
+		score = np.array([self._predict_node(x).score] for x in X)
 		# categorical accuracy
 		acc = np.mean(y == y_pred)
 		
-		return acc
+		return score, acc
