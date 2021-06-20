@@ -1,11 +1,14 @@
 import numpy as np
 
 
-def gini(p):
+def gini_score(p):
 	return 1 - np.sum(np.square(p))
 
-def entropy(p):
+def entropy_score(p):
 	return -np.sum(p * np.log(p))
+
+def random_score(p):
+	return np.random.rand()
 
 
 class DecisionTreeNode:
@@ -26,13 +29,16 @@ class DecisionTree:
 		self.depth = 0
 		self.n_features = 0
 		self.n_classes = 0
+		self.n_leaves = 0
 		self.tree = None
 		self.max_depth = max_depth
 		
 		if criterion == 'entropy':
-			self.score_fn = entropy
+			self.score_fn = entropy_score
+		elif criterion == 'gini':
+			self.score_fn = gini_score
 		else:
-			self.score_fn = gini
+			self.score_fn = random_score
 	
 	def fit(self, X, y):
 		X = np.array(X)
@@ -84,6 +90,8 @@ class DecisionTree:
 				node.threshold = threshold
 				node.left = self._build_tree(X_left, y_left, depth + 1)
 				node.right = self._build_tree(X_right, y_right, depth + 1)
+			else:
+				self.n_leaves += 1
 		
 		return node
 	
@@ -146,7 +154,7 @@ class DecisionTree:
 	
 	def _predict_proba_one(self, x):
 		node = self._predict_node(x)
-		return np.mean(node.num_samples_per_class == node.predicted_class)
+		return np.mean(node.num_samples_per_class[node.predicted_class] / node.num_samples)
 	
 	def _predict_node(self, x):
 		node = self.tree
@@ -161,8 +169,8 @@ class DecisionTree:
 		y = np.array(y)
 		y_pred = self.predict(X)
 		
-		# gini/entropy score
-		score = np.array([self._predict_node(x).score] for x in X)
+		# average gini/entropy score
+		score = np.mean([self._predict_node(x).score] for x in X)
 		# categorical accuracy
 		acc = np.mean(y == y_pred)
 		
