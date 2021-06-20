@@ -65,7 +65,7 @@ class MLPClassifier:
 		
 		sizes = np.concatenate(([k], self.hidden_sizes, [self.n_classes]))
 		
-		# xavier weight initialization
+		# random weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(row) for row, col in zip(sizes[:-1], sizes[1:])]
 		# zero bias initialization
 		self.biases = [np.zeros(row) for row in sizes[1:]]
