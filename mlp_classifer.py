@@ -130,6 +130,9 @@ class MLPClassifier:
 		X = np.dot(X, self.weights[-1]) + self.biases[-1]
 		return softmax(X, axis=1)
 	
+	def predict_log_proba(self, X):
+		return np.log(self.predict_proba(X))
+	
 	def predict(self, X):
 		return np.argmax(self.predict_proba(X), axis=1)
 	
