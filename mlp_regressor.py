@@ -48,7 +48,7 @@ class MLPRegressor:
 			self.activation = identify
 			self.derivative = identify_derivative
 	
-	def fit(self, X, y, epochs=1, lr=1e-3, batch_size=32):
+	def fit(self, X, y, epochs=100, lr=1e-3, batch_size=32):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
@@ -56,7 +56,7 @@ class MLPRegressor:
 		self.n_features = k
 		self.n_outputs = 1
 		
-		sizes = np.concatenate(([k], hidden_sizes, [self.n_outputs]))
+		sizes = np.concatenate(([k], self.hidden_sizes, [self.n_outputs]))
 		
 		# xavier weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(row) for row, col in zip(sizes[:-1], sizes[1:])]

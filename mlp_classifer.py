@@ -55,7 +55,7 @@ class MLPClassifier:
 			self.activation = identify
 			self.derivative = identify_derivative
 	
-	def fit(self, training_data, epochs=1, lr=1e-3, batch_size=32):
+	def fit(self, X, y, epochs=100, lr=1e-3, batch_size=32):
 		X = np.array(X)
 		y = np.array(y)
 		n, k = X.shape
@@ -63,7 +63,7 @@ class MLPClassifier:
 		self.n_features = k
 		self.n_classes = np.max(y) + 1
 		
-		sizes = np.concatenate(([k], hidden_sizes, [self.n_classes]))
+		sizes = np.concatenate(([k], self.hidden_sizes, [self.n_classes]))
 		
 		# xavier weight initialization
 		self.weights = [np.random.randn(row, col) / np.sqrt(row) for row, col in zip(sizes[:-1], sizes[1:])]
