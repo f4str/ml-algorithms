@@ -81,10 +81,10 @@ Various algorithms for supervised learning have been implemented. Each are separ
 	* Gini Split
 	* Entropy Split
 	* Misclassification Split
-- Decision Tree Regressor (in-progress)
+- Decision Tree Regressor
 	* Mean Squared Error Split
 	* Mean Absolute Error Split
-	* Half-Poisson Split
+	* Poisson Deviance Split
 
 ### Support Vector Machines
 
