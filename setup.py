@@ -7,18 +7,17 @@ if readme_file.exists():
     with readme_file.open() as f:
         long_description = f.read()
 else:
-    # When this is first installed in development Docker, README.md is not available
     long_description = ''
 
 setup(
     name='ml-algorithms',
-    version='1.0.0',
+    version='0.1.0',
     description='ML Algorithms',
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='MIT',
     author='Farhan Ahmed',
-    author_email='farhan.ahmed.1@stonybrook.com',
+    author_email='farhaahmed@cs.stonybrook.edu',
     keywords='',
     classifiers=[
         'Programming Language :: Python :: 3',
