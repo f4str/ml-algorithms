@@ -1,36 +1,6 @@
 import numpy as np
 
-
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-
-def sigmoid_derivative(z):
-    return sigmoid(z) * (1 - sigmoid(z))
-
-
-def tanh(z):
-    return np.tanh(z)
-
-
-def tanh_derivative(z):
-    return 1 - np.square(np.tanh(z))
-
-
-def relu(z):
-    return z * (z > 0)
-
-
-def relu_derivative(z):
-    return 1.0 * (z > 0)
-
-
-def identify(z):
-    return z
-
-
-def identify_derivative(z):
-    return 1
+from ml_algorithms import utils
 
 
 class MLPRegressor:
@@ -39,22 +9,21 @@ class MLPRegressor:
         self.activation = activation.lower()
         self.n_layers = len(hidden_sizes) + 2
         self.n_features = 0
-        self.n_outputs = 1
         self.weights = []
         self.biases = []
 
         if self.activation == 'sigmoid':
-            self.activation_fn = sigmoid
-            self.derivative_fn = sigmoid_derivative
+            self.activation_fn = utils.sigmoid
+            self.derivative_fn = utils.sigmoid_derivative
         elif self.activation == 'tanh':
-            self.activation_fn = tanh
-            self.derivative_fn = tanh_derivative
+            self.activation_fn = utils.tanh
+            self.derivative_fn = utils.tanh_derivative
         elif self.activation == 'relu':
-            self.activation_fn = relu
-            self.derivative_fn = relu_derivative
+            self.activation_fn = utils.relu
+            self.derivative_fn = utils.relu_derivative
         else:
-            self.activation_fn = identify
-            self.derivative_fn = identify_derivative
+            self.activation_fn = utils.identify
+            self.derivative_fn = utils.identify_derivative
 
     def fit(self, X, y, epochs=100, lr=1e-3, batch_size=32):
         X = np.array(X)
@@ -62,9 +31,8 @@ class MLPRegressor:
         n, k = X.shape
 
         self.n_features = k
-        self.n_outputs = 1
 
-        sizes = np.concatenate(([k], self.hidden_sizes, [self.n_outputs]))
+        sizes = np.concatenate(([k], self.hidden_sizes, [1]))
 
         # random weight initialization
         self.weights = [

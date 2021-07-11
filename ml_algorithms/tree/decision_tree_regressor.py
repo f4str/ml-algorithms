@@ -1,16 +1,6 @@
 import numpy as np
 
-
-def mse_score(y_true, y_pred):
-    return np.mean(np.square(y_true - y_pred))
-
-
-def mae_score(y_true, y_pred):
-    return np.mean(np.abs(y_true - y_pred))
-
-
-def poisson_score(y_true, y_pred):
-    return np.mean(y_true * np.log(y_true / y_pred) - y_true + y_pred)
+from ml_algorithms import utils
 
 
 class DecisionTreeRegressorNode:
@@ -36,13 +26,13 @@ class DecisionTreeRegressor:
 
         if self.criterion == 'mse':
             self.prediction_fn = lambda x: np.mean(x)
-            self.score_fn = mse_score
+            self.score_fn = utils.mse_score
         elif self.criterion == 'mae':
             self.prediction_fn = lambda x: np.median(x)
-            self.score_fn = mae_score
+            self.score_fn = utils.mae_score
         elif self.criterion == 'poisson':
             self.prediction_fn = lambda x: np.mean(x)
-            self.score_fn = poisson_score
+            self.score_fn = utils.poisson_score
         else:
             raise ValueError(f'invalid criterion: {criterion}')
 
@@ -156,12 +146,9 @@ class DecisionTreeRegressor:
         y = np.array(y)
         y_pred = self.predict(X)
 
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
-
         # average score across all predictions
         score = np.mean([self._predict_node(x).score] for x in X)
-        # r2 score
-        r2 = 1 - sse / s_yy
+        # r^2 score
+        r2 = utils.r2_score(y, y_pred)
 
         return score, r2

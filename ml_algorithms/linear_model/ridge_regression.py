@@ -1,5 +1,7 @@
 import numpy as np
 
+from ml_algorithms import utils
+
 
 class RidgeRegression:
     def __init__(self, alpha=1.0, fit_intercept=True):
@@ -31,13 +33,11 @@ class RidgeRegression:
             self.weights = beta
 
         y_pred = np.dot(X, beta)
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
 
         # mean squared error + l2 penalty loss
-        loss = sse / n + self.alpha * np.mean(np.square(beta))
+        loss = utils.mse_score(y, y_pred) + utils.l2_penalty(self.alpha, self.weights)
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2
 
@@ -48,12 +48,9 @@ class RidgeRegression:
         y = np.array(y)
         y_pred = self.predict(X)
 
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
-
         # mean squared error + l2 penalty loss
-        loss = sse / len(y) + self.alpha * np.mean(np.square(self.weights))
+        loss = utils.mse_score(y, y_pred) + utils.l2_penalty(self.alpha, self.weights)
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2

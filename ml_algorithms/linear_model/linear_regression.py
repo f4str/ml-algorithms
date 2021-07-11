@@ -1,5 +1,7 @@
 import numpy as np
 
+from ml_algorithms import utils
+
 
 class LinearRegression:
     def __init__(self, fit_intercept=True):
@@ -30,13 +32,11 @@ class LinearRegression:
             self.weights = beta
 
         y_pred = np.dot(X, beta)
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
 
         # mean squared error loss
-        loss = sse / n
+        loss = utils.mse_score(y, y_pred)
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2
 
@@ -47,12 +47,9 @@ class LinearRegression:
         y = np.array(y)
         y_pred = self.predict(X)
 
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
-
         # mean squared error loss
-        loss = sse / len(y)
+        loss = utils.mse_score(y, y_pred)
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2

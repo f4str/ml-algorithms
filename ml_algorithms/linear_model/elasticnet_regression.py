@@ -1,5 +1,7 @@
 import numpy as np
 
+from ml_algorithms import utils
+
 
 class ElasticNetRegression:
     def __init__(self, alpha=1.0, l1_ratio=0, fit_intercept=True):
@@ -35,24 +37,18 @@ class ElasticNetRegression:
         for _ in range(epochs):
             y_pred = np.dot(X, self.weights) + self.bias
             d_weights = -2 * np.mean(np.dot(X, y - y_pred))
-            d_l1 = self.alpha * np.mean(np.sign(self.weights))
-            d_l2 = 2 * self.alpha * np.mean(self.weights)
-            d_penalty = self.l1_ratio * d_l1 + (1 - self.l1_ratio) * d_l2
             d_bias = -2 * np.mean(y - y_pred)
+            d_penalty = utils.elasticnet_penalty_gradient(self.alpha, self.l1_ratio, self.weights)
 
             self.weights -= lr * (d_weights + d_penalty)
             self.bias -= lr * d_bias
 
-            sse = np.sum(np.square(y - y_pred))
-            s_yy = np.sum(np.square(y - np.mean(y)))
-            l1 = self.alpha * np.mean(np.sign(self.weights))
-            l2 = 2 * self.alpha * np.mean(self.weights)
-            penalty = self.l1_ratio * l1 + (1 - self.l1_ratio) * l2
-
             # mean squared error + elasticnet penalty loss
-            loss = sse / n + penalty
+            loss = utils.mse_score(y, y_pred) + utils.elasticnet_penalty(
+                self.alpha, self.l1_ratio, self.weights
+            )
             # r^2 score
-            r2 = 1 - sse / s_yy
+            r2 = utils.r2_score(y, y_pred)
 
             training_loss.append(loss)
             training_r2.append(r2)
@@ -66,15 +62,11 @@ class ElasticNetRegression:
         y = np.array(y)
         y_pred = self.predict(X)
 
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
-        l1 = self.alpha * np.mean(np.sign(self.weights))
-        l2 = 2 * self.alpha * np.mean(self.weights)
-        penalty = self.l1_ratio * l1 + (1 - self.l1_ratio) * l2
-
         # mean squared error + elasticnet penalty loss
-        loss = sse / len(y) + penalty
+        loss = utils.mse_score(y, y_pred) + utils.elasticnet_penalty(
+            self.alpha, self.l1_ratio, self.weights
+        )
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2
