@@ -9,7 +9,6 @@ class MLPRegressor:
         self.activation = activation.lower()
         self.n_layers = len(hidden_sizes) + 2
         self.n_features = 0
-        self.n_outputs = 1
         self.weights = []
         self.biases = []
 
@@ -32,9 +31,8 @@ class MLPRegressor:
         n, k = X.shape
 
         self.n_features = k
-        self.n_outputs = 1
 
-        sizes = np.concatenate(([k], self.hidden_sizes, [self.n_outputs]))
+        sizes = np.concatenate(([k], self.hidden_sizes, [1]))
 
         # random weight initialization
         self.weights = [

@@ -61,45 +61,45 @@ mse, r2 = regressor.evaluate(X, y) # mean square error and R2 score
 
 ## Algorithms Available
 
-Various algorithms for supervised and unsupervised learning have been implemented. Each are separated into their own category located in their respective subfolder. Aside from the `utilities` submodule with helper functions, all implementations are completely standalone so there are no other dependencies and the class can be used immediately out of the box.
+Various algorithms for supervised and unsupervised learning have been implemented. Each are separated into their own category located in their respective subfolder. Aside from the `utils` submodule with helper functions, all implementations are completely standalone so there are no other dependencies and the class can be used immediately out of the box.
 
 ### Linear Models
 
-- Linear Regression
-- Ridge Regression
-- Lasso Regression
-- ElasticNet Regression
-- Logistic Regression
-  - L1 Penalty
-  - L2 Penalty
-  - ElasticNet Penalty
+* Linear Regression
+* Ridge Regression
+* Lasso Regression
+* ElasticNet Regression
+* Logistic Regression
+  * L1 Penalty
+  * L2 Penalty
+  * ElasticNet Penalty
 
 ### Decision Trees
 
-- Decision Tree Classifier
-  - Gini Split
-  - Entropy Split
-  - Misclassification Split
-- Decision Tree Regressor
-  - Mean Squared Error Split
-  - Mean Absolute Error Split
-  - Poisson Deviance Split
+* Decision Tree Classifier
+  * Gini Split
+  * Entropy Split
+  * Misclassification Split
+* Decision Tree Regressor
+  * Mean Squared Error Split
+  * Mean Absolute Error Split
+  * Poisson Deviance Split
 
 ### Nearest Neighbors
 
-- K Nearest Neighbors Classifier (in-progress)
-- K Nearest Neighbors Regressor (in-progress)
+* K-Nearest Neighbors Classifier (in-progress)
+* K-Nearest Neighbors Regressor (in-progress)
 
 ### Support Vector Machines
 
-- Support Vector Classifier (in-progress)
-- Support Vector Regressor (in-progress)
+* Support Vector Classifier (in-progress)
+* Support Vector Regressor (in-progress)
 
 ### Neural Networks
 
-- Multilayer Perceptron Regressor
-- Multilayer Perceptron Classifier
+* Multilayer Perceptron Regressor
+* Multilayer Perceptron Classifier
 
 ### Decomposition
 
-- Principal Component Analysis (in-progress)
+* Principal Component Analysis (in-progress)

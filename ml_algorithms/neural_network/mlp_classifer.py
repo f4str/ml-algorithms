@@ -4,7 +4,7 @@ from ml_algorithms import utils
 
 
 class MLPClassifier:
-    def __init__(self, hidden_sizes=(100,), activation='relu'):
+    def __init__(self, hidden_sizes=(10,), activation='relu'):
         self.hidden_sizes = hidden_sizes
         self.activation = activation.lower()
         self.n_layers = len(hidden_sizes) + 2
