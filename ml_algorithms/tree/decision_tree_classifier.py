@@ -1,16 +1,6 @@
 import numpy as np
 
-
-def gini_score(p):
-    return 1 - np.sum(np.square(p))
-
-
-def entropy_score(p):
-    return -np.sum(p * np.log(p))
-
-
-def misclassification_score(p):
-    return 1 - np.max(p)
+from ml_algorithms import utils
 
 
 class DecisionTreeClassifierNode:
@@ -36,11 +26,11 @@ class DecisionTreeClassifier:
         self.max_depth = max_depth
 
         if self.criterion == 'gini':
-            self.score_fn = gini_score
+            self.score_fn = utils.gini_score
         elif self.criterion == 'entropy':
-            self.score_fn = entropy_score
+            self.score_fn = utils.entropy_score
         elif self.criterion == 'misclassification':
-            self.score_fn = misclassification_score
+            self.score_fn = utils.misclassification_score
         else:
             raise ValueError(f'invalid criterion: {criterion}')
 

@@ -1,5 +1,7 @@
 import numpy as np
 
+from ml_algorithms import utils
+
 
 class LassoRegression:
     def __init__(self, alpha=1.0, fit_intercept=True):
@@ -34,19 +36,16 @@ class LassoRegression:
         for _ in range(epochs):
             y_pred = np.dot(X, self.weights) + self.bias
             d_weights = -2 * np.mean(np.dot(X, y - y_pred))
-            d_penalty = self.alpha * np.mean(np.sign(self.weights))
             d_bias = -2 * np.mean(y - y_pred)
+            d_penalty = utils.l1_penalty_gradient(self.alpha, self.weights)
 
             self.weights -= lr * (d_weights + d_penalty)
             self.bias -= lr * d_bias
 
-            sse = np.sum(np.square(y - y_pred))
-            s_yy = np.sum(np.square(y - np.mean(y)))
-
             # mean squared error + l1 penalty loss
-            loss = sse / n + self.alpha * np.mean(np.abs(self.weights))
+            loss = utils.mse_score(y, y_pred) + utils.l1_penalty(self.alpha, self.weights)
             # r^2 score
-            r2 = 1 - sse / s_yy
+            r2 = utils.r2_score(y, y_pred)
 
             training_loss.append(loss)
             training_r2.append(r2)
@@ -60,12 +59,9 @@ class LassoRegression:
         y = np.array(y)
         y_pred = self.predict(X)
 
-        sse = np.sum(np.square(y - y_pred))
-        s_yy = np.sum(np.square(y - np.mean(y)))
-
         # mean squared error + l1 penalty loss
-        loss = sse / len(y) + self.alpha * np.mean(np.abs(self.weights))
+        loss = utils.mse_score(y, y_pred) + utils.l1_penalty(self.alpha, self.weights)
         # r^2 score
-        r2 = 1 - sse / s_yy
+        r2 = utils.r2_score(y, y_pred)
 
         return loss, r2

@@ -1,45 +1,6 @@
 import numpy as np
 
-
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-
-def sigmoid_derivative(z):
-    return sigmoid(z) * (1 - sigmoid(z))
-
-
-def tanh(z):
-    return np.tanh(z)
-
-
-def tanh_derivative(z):
-    return 1 - np.square(np.tanh(z))
-
-
-def relu(z):
-    return z * (z > 0)
-
-
-def relu_derivative(z):
-    return 1.0 * (z > 0)
-
-
-def identify(z):
-    return z
-
-
-def identify_derivative(z):
-    return 1
-
-
-def softmax(z, axis):
-    t = np.exp(z)
-    return t / np.sum(t, axis=axis)
-
-
-def cross_entropy(a, y, axis):
-    return -np.mean(np.sum(y * np.nan_to_num(np.log(a)), axis=axis))
+from ml_algorithms import utils
 
 
 class MLPClassifier:
@@ -53,17 +14,17 @@ class MLPClassifier:
         self.biases = []
 
         if self.activation == 'sigmoid':
-            self.activation_fn = sigmoid
-            self.derivative_fn = sigmoid_derivative
+            self.activation_fn = utils.sigmoid
+            self.derivative_fn = utils.sigmoid_derivative
         elif self.activation == 'tanh':
-            self.activation_fn = tanh
-            self.derivative_fn = tanh_derivative
+            self.activation_fn = utils.tanh
+            self.derivative_fn = utils.tanh_derivative
         elif self.activation == 'relu':
-            self.activation_fn = relu
-            self.derivative_fn = relu_derivative
+            self.activation_fn = utils.relu
+            self.derivative_fn = utils.relu_derivative
         else:
-            self.activation_fn = identify
-            self.derivative_fn = identify_derivative
+            self.activation_fn = utils.identify
+            self.derivative_fn = utils.identify_derivative
 
     def fit(self, X, y, epochs=100, lr=1e-3, batch_size=32):
         X = np.array(X)
@@ -115,7 +76,7 @@ class MLPClassifier:
                     a_batch = self.activation_fn(z_batch)
                     a_batch_layers.append(a_batch)
 
-                a_batch = softmax(z_batch, axis=1)
+                a_batch = utils.softmax(z_batch, axis=1)
                 a_batch_layers[-1] = a_batch
 
                 # backward pass
@@ -144,7 +105,7 @@ class MLPClassifier:
             X = self.activation_fn(np.dot(X, W) + b)
 
         X = np.dot(X, self.weights[-1]) + self.biases[-1]
-        return softmax(X, axis=1)
+        return utils.softmax(X, axis=1)
 
     def predict_log_proba(self, X):
         return np.log(self.predict_proba(X))
@@ -158,7 +119,7 @@ class MLPClassifier:
         y_pred = np.argmax(y_pred_prob, axis=1)
 
         # cross entropy loss
-        loss = cross_entropy(y_pred_prob, one_hot_y, axis=1)
+        loss = utils.cross_entropy(y_pred_prob, one_hot_y, axis=1)
         # categorical accuracy
         acc = np.mean(y_pred == y)
 
