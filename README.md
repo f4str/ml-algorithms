@@ -1,8 +1,35 @@
 # Machine Learning Algorithms
 
-Implementations of commonly-used machine learning algorithms from scratch using ony [numpy](https://numpy.org/). Each algorithm is standalone with no other dependencies of other algorithms.
+Implementations of commonly-used machine learning algorithms from scratch using only [numpy](https://numpy.org/). Each algorithm is standalone with no other dependencies of other algorithms.
 
 All models are intended for a transparent look into their implementation. They are not intended to be efficient or used to practical applications, but simply offer aid to anyone studying machine learning.
+
+## Installation
+
+Clone the repository.
+
+```bash
+git clone https://github.com/f4str/ml-algorithms
+```
+
+Change directories into the cloned repository.
+
+```bash
+cd ml-algorithms
+```
+
+Install Python and create a virtual environment.
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Install the dev dependencies using pip.
+
+```bash
+pip install -e .[dev]
+```
 
 ## User Guide
 
@@ -34,7 +61,7 @@ training_loss, training_acc = classifier.fit(X, y) # returns Tuple[list, list]
 loss, r2 = regressor.fit(X, y) # returns Tuple[float, float]
 ```
 
-### Model prediction
+### Model Prediction
 
 All models have a `predict(X)` method which can be called after training. This will return the predicted values based on the weights learned from training.
 
@@ -50,7 +77,7 @@ y_pred_prob = classifier.predict_proba(X)
 y_pred_log_prob = classifier.predict_log_proba(X)
 ```
 
-### Model evaluation
+### Model Evaluation
 
 To evaluate a model, it is recommended to run `predict(X)` and use your evaluation metrics of choice (accuracy, R2 score, F1 score, cross entropy, MSE, etc.). However, to get a quick and rough estimate of the model performance, all models have an `evaluate(X, y)` method which will return the default loss and evaluation metric. These metrics are model specific.
 
@@ -59,9 +86,9 @@ ce, acc = classifier.evaluate(X, y) # cross entropy and binary accuracy
 mse, r2 = regressor.evaluate(X, y) # mean square error and R2 score
 ```
 
-## Algorithms Available
+## Algorithm Implementations
 
-Various algorithms are implemented for supervised and unsupervised learning. All models are separated into their own category located in their respective subfolder. Aside from the `utils` submodule with helper functions, all implementations are completely standalone so there are no other dependencies and the class can be used immediately out of the box.
+Various algorithms are implemented for both supervised and unsupervised learning tasks. All models are separated into their own category located in their respective subdirectory. Aside from the `utils` submodule with helper functions, all implementations are completely standalone so there are no other dependencies and the class can be used immediately out of the box.
 
 ### Linear Models
 
@@ -103,3 +130,39 @@ Various algorithms are implemented for supervised and unsupervised learning. All
 ### Decomposition
 
 * Principal Component Analysis (in-progress)
+
+## Development
+
+The `tox` library is used to run all tests and code formatting. This is automatically installed with the dev requirements. The available options are as follows.
+
+* Run linting checks using `flake8`.
+
+    ```bash
+    tox -e lint
+    ```
+
+* Run type checks using `mypy`.
+
+    ```bash
+    tox -e type
+    ```
+
+* Run unit tests `pytest`.
+
+    ```bash
+    tox -e test
+    ```
+
+* Run all three of the tests above.
+
+    ```bash
+    tox
+    ```
+
+* Format the code using `black` and `isort` to comply with linting conventions.
+
+    ```bash
+    tox -e format
+    ```
+
+Upon pull request, merge, or push to the `master` branch, the three tests with `tox` will be run using GitHub Actions. The workflow will fail if any of the tests fail. See `.github/workflows/python-package.yml` for more information on how the CI works.
